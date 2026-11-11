@@ -1,0 +1,11 @@
+# Task 3.3 · which door?
+# Write each answer after its colon, save the file, then run:  make check T=3.3
+# Guide: https://networkdoodles.com/labs/networking-101-lab/task-3-3/
+
+# Follow along
+web_port:        # the TCP port web's web server listens on (make shell H=web, then ss -tln)
+dns_port:        # the port dns's DNS server listens on (make shell H=dns, then ss -uln)
+laptop_port:     # the laptop's own port, from curl's last line
+port_22:         # one word: what curl says when you try web.lab:22
+
+# Challenge: nothing to write here. You open a second door on web.

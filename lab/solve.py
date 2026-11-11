@@ -95,6 +95,12 @@ def solve_3_2():
     fill("3.2", {"dns_server": "192.168.2.53", "web_ip": "192.168.2.10"})
 
 
+def solve_3_3():
+    out = run("laptop", "curl -s -o /dev/null -w '%{local_port}' http://web.lab/")
+    run("web", "httpd -p 8080 -h /srv/www")
+    fill("3.3", {"web_port": 80, "dns_port": 53, "laptop_port": out.strip(), "port_22": "refused"})
+
+
 def break_3_1():
     configure("r2", "no ip route 192.168.1.0 255.255.255.0 10.0.0.1")
     print("\n  Something on the way to web is broken now. From the laptop: traceroute -n 192.168.2.10\n")

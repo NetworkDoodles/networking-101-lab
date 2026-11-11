@@ -221,6 +221,29 @@ def t3_2():
     yield lab.pings("laptop", "printer.lab", 1), "ping printer.lab works from the laptop (challenge)"
 
 
+def t3_3():
+    need("laptop", "web", "dns")
+    doc = answers("3.3")
+    yield ask(doc, "web_port", "int", 80, "the TCP port web listens on (follow along)",
+              "but that's not what ss on web says. Look for LISTEN, and the number after the colon.")
+    yield ask(doc, "dns_port", "int", 53, "the port dns listens on (follow along)")
+    # Linux picks a client's temporary port from net.ipv4.ip_local_port_range (32768 to 60999 by default).
+    code, rng = lab.sh("laptop", "cat /proc/sys/net/ipv4/ip_local_port_range")
+    lo, hi = (int(x) for x in rng.split()) if len(rng.split()) == 2 else (32768, 60999)
+    given = norm_int(doc.get("laptop_port") or "")
+    yield ((given is not None and lo <= given <= hi),
+           f"the laptop's own port, from curl (follow along): {doc.get('laptop_port') or 'still blank'}"
+           + ("" if given is not None and lo <= given <= hi else
+              f". It's one the laptop picked, between {lo} and {hi}: curl prints it before the arrow"))
+    yield ask(doc, "port_22", "word", {"refused", "connection refused"}, "what curl says for port 22 (follow along)",
+              "but that's not the word curl used. Look for it at the end of curl's message.")
+    code, out = lab.sh("web", "ss -Htln")
+    listening = any(w.endswith(":8080") for line in out.splitlines() for w in line.split()[3:4])
+    yield listening, "web listens on TCP port 8080 too (challenge)" + ("" if listening else ": ss -tln on web doesn't show it yet")
+    code, page = lab.sh("laptop", "curl -s -m 3 http://web.lab:8080/")
+    yield "Hello from web.lab" in page, f"curl web.lab:8080 from the laptop gets the page (challenge){'' if 'Hello' in page else ': no answer yet'}"
+
+
 # ── the tasks ──────────────────────────────────────────────────────────────────
 TASKS = {
     "1.1": "meet your computer",
@@ -229,6 +252,7 @@ TASKS = {
     "2.2": "one wrong number",
     "3.1": "across two routers",
     "3.2": "names for addresses",
+    "3.3": "which door?",
 }
 CHAPTERS = {1: "your computer", 2: "your network", 3: "other networks"}
 
