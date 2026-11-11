@@ -1,0 +1,12 @@
+# Task 2.1 · who's next door?
+# Write each answer after its colon, save the file, then run:  make check T=2.1
+# Guide: https://networkdoodles.com/labs/networking-101-lab/task-2-1/
+
+# Follow along: the switch's MAC address table (make shell H=sw1, then: show mac address-table)
+laptop_port:
+printer_port:
+
+# Challenge: ping web from the laptop, then read the laptop's neighbour table (ip neigh)
+web_neighbor_ip:
+web_neighbor_mac:
+r1_port:

@@ -1,0 +1,11 @@
+# Task 1.2 · get an address
+# Write each answer after its colon, save the file, then run:  make check T=1.2
+# Guide: https://networkdoodles.com/labs/networking-101-lab/task-1-2/
+
+# Follow along: what the laptop borrowed from DHCP (make shell H=laptop)
+dhcp_server:
+gateway:
+dns_server:
+lease_seconds:
+
+# Challenge: nothing to write here. You change r1, and the checker looks at the laptop's address.

@@ -1,0 +1,6 @@
+# made by the lab, never committed
+.venv/
+__pycache__/
+# containerlab's own state for a running lab
+lab/clab-*/
+clab-*/

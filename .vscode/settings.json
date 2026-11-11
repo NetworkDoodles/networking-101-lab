@@ -1,0 +1,10 @@
+{
+  // Shared by VS Code and code-server. The venv lives in the dev container's image (see .devcontainer/).
+  "python.defaultInterpreterPath": "/home/vscode/.venvs/lab/bin/python",
+  "python.terminal.activateEnvironment": false,
+  "python.useEnvironmentsExtension": false,
+  "containerlab.showWelcomePage": false,
+  "files.associations": { "*.clab.yml": "yaml", "*.cfg": "plaintext" },
+  "files.exclude": { "**/__pycache__": true },
+  "[yaml]": { "editor.tabSize": 2, "editor.insertSpaces": true }
+}

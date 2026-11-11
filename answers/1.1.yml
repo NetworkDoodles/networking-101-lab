@@ -1,0 +1,15 @@
+# Task 1.1 · meet your computer
+# Write each answer after its colon, save the file, then run:  make check T=1.1
+# Copy them exactly as the commands print them. Guide: https://networkdoodles.com/labs/networking-101-lab/task-1-1/
+
+# Follow along: the laptop (make shell H=laptop)
+laptop_mac:
+laptop_ip:
+laptop_prefix:
+
+# Challenge: the printer (make shell H=printer)
+printer_mac:
+printer_ip:
+printer_prefix:
+printer_network:
+printer_broadcast:

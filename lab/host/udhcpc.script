@@ -1,0 +1,19 @@
+#!/bin/sh
+# What the laptop does with a DHCP answer: put on the address, the gateway and the DNS server.
+# (busybox's udhcpc calls this with the lease in environment variables.)
+case "$1" in
+  deconfig)
+    ip addr flush dev "$interface"
+    ip link set "$interface" up
+    ;;
+  bound|renew)
+    ip addr flush dev "$interface"
+    ip addr add "$ip/$mask" dev "$interface"
+    [ -n "$router" ] && ip route replace default via "${router%% *}" dev "$interface"
+    : > /etc/resolv.conf
+    [ -n "$domain" ] && echo "search $domain" >> /etc/resolv.conf
+    for s in $dns; do echo "nameserver $s" >> /etc/resolv.conf; done
+    echo "$(date '+%H:%M:%S') $1: $ip/$mask from $serverid, gateway $router, dns $dns, lease ${lease}s" >> /var/log/dhcp.log
+    ;;
+esac
+exit 0

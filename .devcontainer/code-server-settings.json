@@ -1,0 +1,10 @@
+{
+  "task.allowAutomaticTasks": "on",
+  "workbench.startupEditor": "none",
+  "workbench.colorTheme": "Default Dark Modern",
+  "workbench.secondarySideBar.defaultVisibility": "hidden",
+  "terminal.integrated.defaultProfile.linux": "zsh",
+  "terminal.integrated.initialHint": false,
+  "security.workspace.trust.enabled": false,
+  "telemetry.telemetryLevel": "off"
+}

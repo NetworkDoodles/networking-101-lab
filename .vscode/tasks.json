@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      // Runs when the folder opens: what's running, and where to start.
+      "label": "Lab status",
+      "type": "shell",
+      "command": "make status WAIT=1",
+      "runOptions": { "runOn": "folderOpen" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "focus": false, "clear": true },
+      "problemMatcher": []
+    },
+    { "label": "Check everything", "type": "shell", "command": "make check", "problemMatcher": [] },
+    { "label": "Restart the lab", "type": "shell", "command": "make reset", "problemMatcher": [] }
+  ]
+}

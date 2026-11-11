@@ -1,0 +1,5 @@
+# The lab's DNS names: one line per name, the IP address first.
+# The dns host re-reads this file by itself as soon as you save it.
+192.168.2.10  web.lab
+192.168.2.53  dns.lab
+192.168.1.1   r1.lab

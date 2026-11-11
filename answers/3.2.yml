@@ -1,0 +1,9 @@
+# Task 3.2 · names for addresses
+# Write each answer after its colon, save the file, then run:  make check T=3.2
+# Guide: https://networkdoodles.com/labs/networking-101-lab/task-3-2/
+
+# Follow along (make shell H=laptop)
+dns_server:
+web_ip:
+
+# Challenge: nothing to write here. You add a name to lab/dns/lab.hosts.

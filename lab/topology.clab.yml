@@ -1,0 +1,78 @@
+# The lab, in containerlab: a home network and two servers, two routers apart.
+#
+#   laptop ────┐
+#   printer ───┼── sw1 ── r1 ════ 10.0.0.0/30 ════ r2 ──┬── web  192.168.2.10/28
+#   broken-pc ─┘     192.168.1.0/24                     └── dns  192.168.2.53/28
+#
+# sw1, r1 and r2 run CapeOS Bolt (a lab network OS with an IOS-style CLI); the five hosts are small
+# Linux computers (lab/host/). containerlab names ports by their Linux names: eth1 is GigabitEthernet1.
+name: net101
+prefix: ""                          # containers are named after the nodes
+
+mgmt:
+  network: net101-mgmt
+  ipv4-subnet: 172.80.101.0/24
+
+topology:
+  kinds:
+    linux:
+      image: nd-host:1
+  nodes:
+    # The switch and the routers boot from these configs. What you change on them lasts until
+    # `make reset`; the files themselves never change.
+    sw1:
+      kind: linux
+      image: ghcr.io/dkhenderson2/capeos-bolt:0.11.0
+      env: { CAPEOS_PLATFORM: switch, CAPEOS_USER: admin, CAPEOS_PASSWORD: capeos-lab }
+      binds: [configs/sw1.cfg:/flash/startup-config:ro]
+    r1:
+      kind: linux
+      image: ghcr.io/dkhenderson2/capeos-bolt:0.11.0
+      env: { CAPEOS_USER: admin, CAPEOS_PASSWORD: capeos-lab }
+      binds: [configs/r1.cfg:/flash/startup-config:ro]
+    r2:
+      kind: linux
+      image: ghcr.io/dkhenderson2/capeos-bolt:0.11.0
+      env: { CAPEOS_USER: admin, CAPEOS_PASSWORD: capeos-lab }
+      binds: [configs/r2.cfg:/flash/startup-config:ro]
+
+    # The hosts have no management port: like a real computer, eth1 is their only network card.
+    laptop:    { kind: linux, network-mode: none, exec: [start laptop] }
+    printer:   { kind: linux, network-mode: none, exec: [start printer] }
+    broken-pc: { kind: linux, network-mode: none, exec: [start broken-pc] }
+    web:       { kind: linux, network-mode: none, exec: [start web] }
+    dns:
+      kind: linux
+      network-mode: none
+      binds: [dns:/etc/lab-dns:ro]
+      exec: [start dns]
+
+  # Every cable carries ordinary 1500-byte frames, like the cables at home.
+  links:
+    - { endpoints: ["sw1:eth1", "r1:eth1"], mtu: 1500 }
+    - type: veth
+      mtu: 1500
+      endpoints:
+        - { node: sw1, interface: eth2 }
+        - { node: laptop, interface: eth1, mac: "aa:aa:aa:11:11:11" }
+    - type: veth
+      mtu: 1500
+      endpoints:
+        - { node: sw1, interface: eth3 }
+        - { node: printer, interface: eth1, mac: "aa:aa:aa:22:22:22" }
+    - type: veth
+      mtu: 1500
+      endpoints:
+        - { node: sw1, interface: eth4 }
+        - { node: broken-pc, interface: eth1, mac: "aa:aa:aa:33:33:33" }
+    - { endpoints: ["r1:eth2", "r2:eth1"], mtu: 1500 }
+    - type: veth
+      mtu: 1500
+      endpoints:
+        - { node: r2, interface: eth2 }
+        - { node: web, interface: eth1, mac: "aa:aa:aa:44:44:44" }
+    - type: veth
+      mtu: 1500
+      endpoints:
+        - { node: r2, interface: eth3 }
+        - { node: dns, interface: eth1, mac: "aa:aa:aa:55:55:55" }

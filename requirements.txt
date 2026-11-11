@@ -1,0 +1,2 @@
+# The lab's Python tools. The dev container bakes these into its image.
+# (none yet: the checker uses only Python's standard library)
