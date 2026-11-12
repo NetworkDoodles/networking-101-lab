@@ -214,8 +214,9 @@
     b.textContent = "Deleting …";
     const r = await nd("finish", {}).then((x) => x.json()).catch((e) => ({ error: String(e) }));
     if (!r.ok) { alert("It didn't finish: " + (r.error || "no answer")); b.disabled = false; b.textContent = "Finish lab"; return; }
-    document.body.innerHTML = "<div class='idle'><p>Done. The codespace is deleted.</p><a class='btn' href='" +
-      r.next + "'>Back to the labs</a></div>";
+    // back to the lab's page on networkdoodles.com
+    document.body.innerHTML = "<div class='idle'><p>Done. The codespace is deleted. Taking you back to networkdoodles.com …</p></div>";
+    setTimeout(() => { location.href = r.next; }, 1500);
   }
 
   // ── layout ───────────────────────────────────────────────────────────────
