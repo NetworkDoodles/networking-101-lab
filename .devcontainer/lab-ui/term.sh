@@ -7,7 +7,10 @@ python3 -c 'import json,sys; t=json.load(open(sys.argv[1])).get("topology") or {
   "$HERE/lab-ui.json" "$NODE" || { echo "no node called '$NODE' in this lab"; exit 1; }
 cd "$HERE/../.."
 until docker ps --format '{{.Names}}' | grep -qx "$NODE"; do
-  echo "$NODE isn't running yet: waiting for the network to come up ..."
+  echo "$NODE isn't running yet: waiting for it to start (the guide says when it does) ..."
   sleep 5
 done
-exec make -s shell H="$NODE"
+# The lab's own make target for a shell on a node: "terminal": {"make": "ssh", "var": "NODE"} in lab-ui.json,
+# or make shell H=<node> by default.
+read -r TARGET VAR < <(python3 -c 'import json,sys; t=json.load(open(sys.argv[1])).get("terminal") or {}; print(t.get("make", "shell"), t.get("var", "H"))' "$HERE/lab-ui.json")
+exec make -s "$TARGET" "$VAR=$NODE"

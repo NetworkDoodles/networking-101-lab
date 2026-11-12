@@ -101,13 +101,17 @@ def network():
 
 
 def running():
-    """The lab's containers that are running, by name (containerlab names them after the nodes)."""
+    """The Topology tab's containers that are running, by name (containerlab names them after the nodes). The
+    topology can name its own containerlab lab ("lab"), when the network the top bar counts is something else."""
     net = CONFIG.get("network")
-    if not net:
+    if TOPO and TOPO.get("lab"):
+        label = f"containerlab={TOPO['lab']}"
+    elif net:
+        label = net.get("label", f"containerlab={net['name']}")
+    else:
         return []
     try:
-        r = subprocess.run(["docker", "ps", "--format", "{{.Names}}", "--filter",
-                            "label=" + net.get("label", f"containerlab={net['name']}")],
+        r = subprocess.run(["docker", "ps", "--format", "{{.Names}}", "--filter", "label=" + label],
                            capture_output=True, text=True, timeout=5)
     except (OSError, subprocess.TimeoutExpired):
         return []
