@@ -1,8 +1,8 @@
 # Task 2.1 · who's next door?
-# Write each answer after its colon, save the file, then run:  make check T=2.1
+# Write each answer after its colon, then click Check task 2.1 under the guide.
 # Guide: https://networkdoodles.com/labs/networking-101-lab/task-2-1/
 
-# Follow along: the switch's MAC address table (make shell H=sw1, then: show mac address-table)
+# Follow along: the switch's MAC address table (the sw1 tab: click sw1 on the Topology tab, then: show mac address-table)
 laptop_port:
 printer_port:
 

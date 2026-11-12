@@ -482,6 +482,7 @@
     cfg.tabs = cfg.tabs.filter((t) => !t.hidden);
     document.title = cfg.title + " · Network Doodles lab";
     $("#lab-title").textContent = "· " + cfg.title;
+    $("#home").href = cfg.guide;   // back to the lab's page on networkdoodles.com, in a new tab
     for (const t of cfg.tabs) addTab(t);
     // the terminals you had open, and any the lab opens to start with ("terminals": ["laptop"])
     const nodes = new Set((cfg.topology?.nodes || []).filter((n) => n.shell !== false).map((n) => n.id));

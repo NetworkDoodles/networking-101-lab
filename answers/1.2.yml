@@ -1,8 +1,8 @@
 # Task 1.2 · get an address
-# Write each answer after its colon, save the file, then run:  make check T=1.2
+# Write each answer after its colon, then click Check task 1.2 under the guide.
 # Guide: https://networkdoodles.com/labs/networking-101-lab/task-1-2/
 
-# Follow along: what the laptop borrowed from DHCP (make shell H=laptop)
+# Follow along: what the laptop borrowed from DHCP (the laptop tab: click laptop on the Topology tab)
 dhcp_server:
 gateway:
 dns_server:

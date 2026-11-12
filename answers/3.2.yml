@@ -1,8 +1,8 @@
 # Task 3.2 · names for addresses
-# Write each answer after its colon, save the file, then run:  make check T=3.2
+# Write each answer after its colon, then click Check task 3.2 under the guide.
 # Guide: https://networkdoodles.com/labs/networking-101-lab/task-3-2/
 
-# Follow along (make shell H=laptop)
+# Follow along (the laptop tab: click laptop on the Topology tab)
 dns_server:
 web_ip:
 

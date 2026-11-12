@@ -1,10 +1,10 @@
 # Task 3.1 · across two routers
-# Write each answer after its colon, save the file, then run:  make check T=3.1
+# Write each answer after its colon, then click Check task 3.1 under the guide.
 # Guide: https://networkdoodles.com/labs/networking-101-lab/task-3-1/
 
 # Follow along
 r1_next_hop:
 hops_to_web:
 
-# Challenge: after make break T=3.1, which router was missing a route? (r1 or r2)
+# Challenge: after Break it (next to Check task), which router was missing a route? (r1 or r2)
 broken_router:

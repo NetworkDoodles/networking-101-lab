@@ -114,4 +114,4 @@ if __name__ == "__main__":
     print(f"\n  {action} task {task}:\n")
     fn()
     if action == "solve":
-        print(f"\n  done. Now: make check T={task}\n")
+        print(f"\n  done. Now: Check task {task} (or make check T={task})\n")
