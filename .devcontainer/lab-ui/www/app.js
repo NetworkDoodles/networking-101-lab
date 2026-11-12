@@ -298,7 +298,9 @@
       const g = el("g", { class: "ns-link" }, links);
       el("line", { x1: na.x, y1: na.y, x2: nb.x, y2: nb.y }, g);
       el("line", { class: "hit", x1: na.x, y1: na.y, x2: nb.x, y2: nb.y }, g);
-      g.addEventListener("pointerenter", (e) => showTip(e, "<b>" + a.replace(":", " ") + "</b> ↔ <b>" + b.replace(":", " ") + "</b>"));
+      // "linkTip": a line for each cable's hover card, with {a} and {b} for its two ends (e.g. how to capture on it)
+      const lt = T.linkTip ? "<p class='tt-foot'>" + escHtml(T.linkTip.replaceAll("{a}", a).replaceAll("{b}", b)) + "</p>" : "";
+      g.addEventListener("pointerenter", (e) => showTip(e, "<b>" + a.replace(":", " ") + "</b> ↔ <b>" + b.replace(":", " ") + "</b>" + lt));
       g.addEventListener("pointermove", moveTip);
       g.addEventListener("pointerleave", () => { tip.hidden = true; });
     }
