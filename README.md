@@ -17,11 +17,18 @@ routing and DNS.
 
 ## Start
 
+The easy way: **Open the lab** on the [guide's page](https://networkdoodles.com/labs/networking-101-lab/), and
+sign in with GitHub. It creates your codespace and opens the lab app: the guide on the left, VS Code on the
+right. The first start takes a few minutes.
+
+Or from here, in GitHub's own editor:
+
 1. Click **Open in GitHub Codespaces** above, then **Create codespace**. If VS Code asks whether you trust
    the folder, click **Trust Folder & Continue**.
-2. Wait for the **Lab status** terminal to show every node with a green tick (the first start takes a few
-   minutes).
-3. Follow [task 1.1](https://networkdoodles.com/labs/networking-101-lab/task-1-1/).
+2. The lab app opens in a new browser tab (port 8000, **Lab** in the PORTS tab). Wait for it to say
+   **network up**: the first start takes a few minutes.
+3. Follow [task 1.1](https://networkdoodles.com/labs/networking-101-lab/task-1-1/). **Check task**, under the
+   guide, checks your work.
 
 ## Commands
 
