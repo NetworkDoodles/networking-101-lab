@@ -10,6 +10,11 @@
   ],
   "answers": "answers/{task}.yml",
   "edit": {"3.2": ["lab/dns/lab.hosts"]},
+  "actions": [
+    {"id": "reset", "label": "Reset network", "make": "reset", "bar": true, "busy": "Resetting", "title": "Put the whole network back how it started. Your answers stay as they are.", "confirm": "Reset the network?\n\nEvery device goes back to how it started (about a minute). Your answers stay as they are."},
+    {"id": "solve", "label": "Solve it for me", "make": "solve", "task": true, "busy": "Solving", "title": "Stuck, or skipped this task? Does it for you on the network and fills in its answers, printing every command.", "confirm": "Solve this task for you?\n\nIt does the task on the network and fills in its answers, printing every command it runs, so you can follow along afterwards."},
+    {"id": "break", "label": "Break it", "make": "break", "tasks": ["3.1"], "busy": "Breaking", "title": "Set up this task's problem on purpose."}
+  ],
   "topology": {
     "hint": "Click a device to open a terminal on it, in a tab of its own. Hover for what it is and where its cables go.",
     "nodes": [

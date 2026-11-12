@@ -25,6 +25,7 @@
     btn.hidden = id === "overview";
     btn.querySelector("span").textContent = "Check task " + id;
     $("#check-out").hidden = true;
+    actionButtons(id);
     loadAnswers(id);
   }
 
@@ -87,6 +88,41 @@
       sel.append(g);
     }
     if (keep) sel.value = keep;
+  }
+
+  // ── actions ──────────────────────────────────────────────────────────────
+  // "actions" in lab-ui.json: buttons for the lab's make targets. "bar": true puts one in the top bar (Reset);
+  // the rest sit by Check task, for every task ("task": true) or only some ("tasks": ["3.1"]).
+  function actionButtons(id) {
+    const box = $("#acts");
+    box.innerHTML = "";
+    for (const a of cfg.actions || []) {
+      if (a.bar || id === "overview" || (a.tasks && !a.tasks.includes(id))) continue;
+      box.append(actionButton(a, () => id));
+    }
+  }
+  function actionButton(a, task) {
+    const b = document.createElement("button");
+    b.className = "act";
+    b.textContent = a.label;
+    if (a.title) b.title = a.title;
+    b.onclick = async () => {
+      if (a.confirm && !confirm(a.confirm)) return;
+      const t = task(), out = $("#check-out");
+      b.disabled = true;
+      const label = b.textContent;
+      b.textContent = (a.busy || "Working") + " …";
+      const r = await api("action", { id: a.id, task: t }).catch((e) => ({ ok: false, output: String(e) }));
+      out.className = "check-out " + (r.ok ? "ok" : "bad");
+      out.querySelector("pre").textContent = r.output || r.error || (r.ok ? "Done." : "It didn't work.");
+      out.hidden = false;
+      b.disabled = false;
+      b.textContent = label;
+      if (t && t !== "overview") loadAnswers(t);   // solve fills in the answers: show them
+      refresh();
+      if (active && active.kind === "topology") topoState();
+    };
+    return b;
   }
 
   async function check() {
@@ -469,6 +505,7 @@
     $("#prev").onclick = () => step(-1);
     $("#next").onclick = () => step(1);
     $("#check").onclick = check;
+    for (const a of (cfg.actions || []).filter((x) => x.bar)) $("#bar-acts").append(actionButton(a, () => $("#task").value));
     $("#answers-text").addEventListener("input", () => { $("#answers-state").textContent = "not saved yet"; });
     $("#answers-text").addEventListener("blur", saveAnswers);
     $("#answers-text").addEventListener("keydown", (e) => { if ((e.ctrlKey || e.metaKey) && e.key === "s") { e.preventDefault(); saveAnswers(); } });

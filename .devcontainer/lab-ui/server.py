@@ -35,6 +35,9 @@ SHELLS = [n["id"] for n in TOPO["nodes"] if n.get("shell", True)] if TOPO else [
 # answers file ("answers/{task}.yml" fills in the task's number), "edit" adds others for some tasks.
 ANSWERS = CONFIG.get("answers")
 EDIT = CONFIG.get("edit", {})
+# Buttons that run one of the lab's make targets ("actions"), so a lab without the VS Code tab can still reset,
+# solve or break things. "task": true adds T=<the task>; "tasks" limits one to those tasks.
+ACTIONS = {a["id"]: a for a in CONFIG.get("actions", [])}
 lock = threading.Lock()
 
 
@@ -198,6 +201,15 @@ class API(BaseHTTPRequestHandler):
                 return self.send(400, {"error": f"task {task!r} doesn't edit {path!r}"})
             f.write_text(text)
             return self.send(200, {"task": task, "path": path, "saved": True})
+        if self.path == "/api/action":
+            a, task = ACTIONS.get(str(body.get("id", ""))), str(body.get("task", ""))
+            if not a or ((a.get("task") or a.get("tasks")) and task not in TASKS) or (a.get("tasks") and task not in a["tasks"]):
+                return self.send(400, {"error": "no such action for this task"})
+            try:
+                rc, out = make(a["make"], *([f"T={task}"] if a.get("task") or a.get("tasks") else []), timeout=600)
+            except subprocess.TimeoutExpired:
+                return self.send(200, {"ok": False, "output": "it took too long"})
+            return self.send(200, {"ok": rc == 0, "output": out})
         if self.path == "/api/start":
             tab = TABS.get(str(body.get("tab", "")))
             if not tab or not tab.get("start"):

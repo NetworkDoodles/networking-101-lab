@@ -74,6 +74,16 @@ body.dragging iframe { pointer-events: none; }
 .idle .btn { width: auto; padding: 0 18px; }
 .idle pre { max-width: 680px; text-align: left; font: 12px/1.5 var(--mono); white-space: pre-wrap; }
 
+/* actions: by Check task, and in the top bar */
+.acts { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.acts:empty { display: none; }
+.act { flex: 1; height: 30px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line-strong); background: none;
+  color: var(--text); font: 600 12px var(--mono); cursor: pointer; white-space: nowrap; }
+.act:hover { border-color: var(--cyan); color: var(--ice); }
+.act:disabled { opacity: .6; cursor: progress; }
+.bar-acts { display: flex; gap: 6px; }
+.bar-acts .act { flex: none; color: var(--muted); }
+
 /* terminal tabs: closable */
 .tab.term { text-transform: none; letter-spacing: 0; }
 .tab .x { margin-left: 2px; padding: 0 4px; border-radius: 4px; color: var(--muted); font-size: 15px; line-height: 1; }
