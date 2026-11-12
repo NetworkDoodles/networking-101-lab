@@ -56,7 +56,7 @@ def caddyfile():
         out.append(f"\tredir {p} {p}/")
         out.append(f"\t{'handle_path' if t.get('strip') else 'handle'} {p}/* {{\n"
                    f"\t\treverse_proxy 127.0.0.1:{t['port']}\n\t}}")
-    out.append(f"\thandle {{\n\t\theader Cache-Control no-cache\n\t\troot * {HERE / 'www'}\n\t\tfile_server\n\t}}")
+    out.append(f"\thandle {{\n\t\theader Cache-Control no-store\n\t\troot * {HERE / 'www'}\n\t\tfile_server\n\t}}")
     out.append("}")
     return "\n".join(out) + "\n"
 
