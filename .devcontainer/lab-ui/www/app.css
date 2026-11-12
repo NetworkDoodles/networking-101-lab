@@ -51,17 +51,17 @@ body.no-guide .guide, body.no-guide .split { display: none; }
 .guide-head { display: flex; align-items: center; gap: 6px; padding: 8px; border-bottom: 1px solid var(--line); }
 .guide-head select { flex: 1; min-width: 0; height: 32px; padding: 0 8px; border-radius: 8px; border: 1px solid var(--line-strong);
   background: var(--raised); color: var(--ice); font: 13px var(--mono); }
-#guide-frame { flex: 1; width: 100%; border: 0; background: var(--bg); }
+#guide-frame { flex: 1; width: 100%; min-height: 34vh; border: 0; background: var(--bg); }
 .split { width: 5px; cursor: col-resize; background: transparent; flex: none; margin-left: -3px; z-index: 2; }
 .split:hover, .split.drag { background: var(--line-strong); }
 body.dragging iframe { pointer-events: none; }
 
 .check { border-top: 1px solid var(--line); padding: 8px; }
-.check-out { max-height: 40vh; overflow: auto; margin-bottom: 8px; border-radius: 8px; border: 1px solid var(--line);
+.check-out { position: relative; max-height: 24vh; overflow: auto; margin-bottom: 8px; border-radius: 8px; border: 1px solid var(--line);
   background: var(--bg); }
 .check-out.ok { border-color: rgba(77, 255, 176, .5); }
 .check-out.bad { border-color: rgba(255, 93, 108, .5); }
-.check-out pre { margin: 0; padding: 10px; font: 12px/1.5 var(--mono); white-space: pre-wrap; color: var(--text); }
+.check-out pre { margin: 0; padding: 10px 28px 10px 10px; font: 12px/1.5 var(--mono); white-space: pre-wrap; color: var(--text); }
 .btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 36px; border-radius: 8px;
   border: 1px solid rgba(77, 255, 176, .45); background: rgba(77, 255, 176, .08); color: var(--green);
   font: 600 13px var(--mono); cursor: pointer; }
@@ -94,13 +94,24 @@ body.dragging iframe { pointer-events: none; }
 
 /* answers, under the guide */
 .answers { border-top: 1px solid var(--line); padding: 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
-.answers-head { display: flex; justify-content: space-between; font: 12px var(--mono); color: var(--muted); }
+.answers-head { display: flex; align-items: center; gap: 4px; font: 12px var(--mono); color: var(--muted); }
+.answers-head .answers-state { margin-left: auto; }
+.answers-fold { display: grid; place-items: center; width: 22px; height: 22px; border: 0; border-radius: 6px; background: none;
+  color: var(--muted); cursor: pointer; flex: none; }
+.answers-fold:hover { background: var(--raised); color: var(--ice); }
+.answers-fold svg { width: 14px; height: 14px; transition: transform .15s; }
+.answers.folded .answers-fold svg { transform: rotate(-90deg); }
+.answers.folded textarea { display: none; }
+.answers.folded { padding-bottom: 6px; }
+.check-close { position: sticky; float: right; top: 4px; margin: 4px 4px 0 0; width: 22px; height: 22px; border: 0; border-radius: 6px;
+  background: var(--raised); color: var(--muted); font-size: 15px; line-height: 1; cursor: pointer; z-index: 1; }
+.check-close:hover { color: var(--ice); }
 .answers-pick { display: flex; gap: 4px; flex-wrap: wrap; }
 .answers-pick button { border: 0; border-radius: 6px; padding: 3px 8px; background: none; color: var(--muted); font: 12px var(--mono); cursor: pointer; }
 .answers-pick button[aria-pressed="true"] { background: var(--raised); color: var(--ice); }
 .answers-pick button:only-child { cursor: default; padding-left: 0; background: none; }
 .answers-state { color: var(--muted); }
-.answers textarea { height: 28vh; min-height: 120px; resize: vertical; width: 100%; padding: 8px 10px; border-radius: 8px;
+.answers textarea { height: 18vh; min-height: 90px; max-height: 40vh; resize: vertical; width: 100%; padding: 8px 10px; border-radius: 8px;
   border: 1px solid var(--line-strong); background: var(--bg); color: var(--text); font: 13px/1.5 var(--mono); tab-size: 2; }
 .answers textarea:focus { outline: none; border-color: var(--cyan); }
 

@@ -509,6 +509,14 @@
     $("#next").onclick = () => step(1);
     $("#check").onclick = check;
     for (const a of (cfg.actions || []).filter((x) => x.bar)) $("#bar-acts").append(actionButton(a, () => $("#task").value));
+    const fold = (on) => {
+      $("#answers").classList.toggle("folded", on);
+      $("#answers-fold").setAttribute("aria-expanded", !on);
+      store.set("answers", on ? "folded" : "open");
+    };
+    fold(store.get("answers") === "folded");
+    $("#answers-fold").onclick = () => fold(!$("#answers").classList.contains("folded"));
+    $("#check-close").onclick = () => { $("#check-out").hidden = true; };
     $("#answers-text").addEventListener("input", () => { $("#answers-state").textContent = "not saved yet"; });
     $("#answers-text").addEventListener("blur", saveAnswers);
     $("#answers-text").addEventListener("keydown", (e) => { if ((e.ctrlKey || e.metaKey) && e.key === "s") { e.preventDefault(); saveAnswers(); } });
