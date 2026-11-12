@@ -42,7 +42,7 @@
   "postCreateCommand": "make setup images",
   // Every start: the lab app (already running on the first start), its tunnel if the lab was opened from the
   // site, and the network, side by side.
-  "postStartCommand": { "app": "bash .devcontainer/lab-ui/start.sh && bash .devcontainer/lab-ui/tunnel.sh", "lab": "make up" },
+  "postStartCommand": { "app": "bash .devcontainer/lab-ui/start.sh; bash .devcontainer/lab-ui/tunnel.sh", "lab": "make up" },
 
   "customizations": {
     "vscode": {
