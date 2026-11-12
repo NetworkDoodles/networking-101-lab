@@ -46,22 +46,81 @@
     pick.innerHTML = "";
     files.forEach((f, i) => {
       const b = document.createElement("button");
-      b.textContent = f.path;
+      b.textContent = isForm(f.text) ? "Your answers" : f.path;
+      b.title = f.path;
       b.onclick = () => showFile(i);
       pick.append(b);
     });
     if (files.length) showFile(0);
   }
+  // An answers file (key: value lines, a "# question" after each key, "# Follow along" / "# Challenge" headings)
+  // shows as a form: one box per question, written back into the file in place. Anything else is a plain editor.
+  const KEY = /^(\w+):(.*)$/;
+  function isForm(text) {
+    const lines = text.split("\n").filter((l) => l.trim() && !l.trim().startsWith("#"));
+    return lines.length > 0 && lines.every((l) => KEY.test(l));
+  }
+  function setAnswer(text, key, value) {
+    value = value.replace(/\s#/g, " ").replace(/[\r\n]+/g, " ").trim();   // " #" would start a comment
+    return text.split("\n").map((l) => {
+      const m = l.match(KEY);
+      if (!m || m[1] !== key) return l;
+      const note = m[2].includes(" #") ? m[2].slice(m[2].indexOf(" #")) : "";
+      return (key + ": " + value).trimEnd() + (note ? "   " + note.trimStart() : "");
+    }).join("\n");
+  }
+  function renderForm(f) {
+    const box = $("#answers-form");
+    box.innerHTML = "";
+    let intro = true;
+    for (const line of f.text.split("\n")) {
+      const t = line.trim();
+      if (!t) { intro = false; continue; }
+      if (t.startsWith("#")) {
+        if (intro) continue;                                  // the file's own header: the task and how to fill it in
+        const c = t.replace(/^#+\s*/, "");
+        const [head, ...rest] = c.split(":");
+        const h = document.createElement("div");
+        h.className = "af-head";
+        h.innerHTML = "<b></b><span></span>";
+        h.firstChild.textContent = head;
+        h.lastChild.textContent = rest.join(":").trim();
+        box.append(h);
+        continue;
+      }
+      intro = false;
+      const m = line.match(KEY);
+      if (!m) continue;
+      const key = m[1], val = m[2].split(" #")[0].trim(), note = m[2].includes(" #") ? m[2].slice(m[2].indexOf(" #") + 2).trim() : "";
+      const row = document.createElement("label");
+      row.className = "af-row";
+      row.innerHTML = "<span></span><input type='text' spellcheck='false' autocomplete='off'>";
+      row.firstChild.textContent = note || key.replaceAll("_", " ");
+      const inp = row.lastChild;
+      inp.value = val;
+      inp.dataset.key = key;
+      inp.addEventListener("input", () => {
+        f.text = setAnswer(f.text, key, inp.value);
+        $("#answers-state").textContent = "not saved yet";
+      });
+      inp.addEventListener("blur", saveAnswers);
+      inp.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); saveAnswers(); } });
+      box.append(row);
+    }
+  }
   function showFile(i) {
-    if (cur >= 0) files[cur].text = $("#answers-text").value;
+    if (cur >= 0 && !files[cur].form) files[cur].text = $("#answers-text").value;
     cur = i;
     [...$("#answers-pick").children].forEach((b, j) => b.setAttribute("aria-pressed", i === j));
-    $("#answers-text").value = files[i].text;
-    $("#answers-state").textContent = files[i].text === files[i].saved ? "" : "not saved yet";
+    const f = files[i];
+    f.form = isForm(f.text);
+    $("#answers").classList.toggle("is-form", f.form);
+    if (f.form) renderForm(f); else $("#answers-text").value = f.text;
+    $("#answers-state").textContent = f.text === f.saved ? "" : "not saved yet";
   }
   async function saveAnswers() {
     if (cur < 0) return;
-    files[cur].text = $("#answers-text").value;
+    if (!files[cur].form) files[cur].text = $("#answers-text").value;
     for (const f of files) {
       if (f.text === f.saved) continue;
       const r = await api("file", { task: fileTask, path: f.path, text: f.text }).catch(() => null);

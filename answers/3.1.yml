@@ -3,8 +3,8 @@
 # Guide: https://networkdoodles.com/labs/networking-101-lab/task-3-1/
 
 # Follow along
-r1_next_hop:
-hops_to_web:
+r1_next_hop:   # Where r1 sends packets for 192.168.2.0/24
+hops_to_web:   # How many hops traceroute counts to web
 
 # Challenge: after Break it (next to Check task), which router was missing a route? (r1 or r2)
-broken_router:
+broken_router:   # Which router was missing a route

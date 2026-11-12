@@ -3,10 +3,10 @@
 # Guide: https://networkdoodles.com/labs/networking-101-lab/task-2-1/
 
 # Follow along: the switch's MAC address table (the sw1 tab: click sw1 on the Topology tab, then: show mac address-table)
-laptop_port:
-printer_port:
+laptop_port:   # The laptop's port on sw1
+printer_port:   # The printer's port on sw1
 
 # Challenge: ping web from the laptop, then read the laptop's neighbour table (ip neigh)
-web_neighbor_ip:
-web_neighbor_mac:
-r1_port:
+web_neighbor_ip:   # The address the laptop asked ARP about, to reach web
+web_neighbor_mac:   # The MAC address it learned for it
+r1_port:   # r1's port on sw1

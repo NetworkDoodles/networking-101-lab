@@ -38,7 +38,8 @@ def fill(task, values):
     for i, line in enumerate(lines):
         key = line.split(":")[0].strip()
         if key in values and not line.lstrip().startswith("#"):
-            lines[i] = f"{key}: {values[key]}"
+            note = line.partition(" #")[2]          # the question after the key stays
+            lines[i] = f"{key}: {values[key]}" + (f"   #{note}" if note else "")
     path.write_text("\n".join(lines) + "\n")
     print(f"  {'answers':<10} filled in answers/{task}.yml")
 

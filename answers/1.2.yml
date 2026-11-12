@@ -3,9 +3,9 @@
 # Guide: https://networkdoodles.com/labs/networking-101-lab/task-1-2/
 
 # Follow along: what the laptop borrowed from DHCP (the laptop tab: click laptop on the Topology tab)
-dhcp_server:
-gateway:
-dns_server:
-lease_seconds:
+dhcp_server:   # The DHCP server's address
+gateway:   # The laptop's default gateway
+dns_server:   # The laptop's DNS server
+lease_seconds:   # The lease time, in seconds
 
 # Challenge: nothing to write here. You change r1, and the checker looks at the laptop's address.

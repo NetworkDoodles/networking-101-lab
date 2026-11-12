@@ -3,7 +3,7 @@
 # Guide: https://networkdoodles.com/labs/networking-101-lab/task-3-2/
 
 # Follow along (the laptop tab: click laptop on the Topology tab)
-dns_server:
-web_ip:
+dns_server:   # The laptop's DNS server
+web_ip:   # web.lab's address, from dig
 
 # Challenge: nothing to write here. You add a name to lab/dns/lab.hosts.

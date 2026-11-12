@@ -3,13 +3,13 @@
 # Copy them exactly as the commands print them. Guide: https://networkdoodles.com/labs/networking-101-lab/task-1-1/
 
 # Follow along: the laptop (the laptop tab: click laptop on the Topology tab)
-laptop_mac:
-laptop_ip:
-laptop_prefix:
+laptop_mac:   # The laptop's MAC address
+laptop_ip:   # The laptop's IP address
+laptop_prefix:   # The laptop's prefix
 
 # Challenge: the printer (the printer tab: click printer on the Topology tab)
-printer_mac:
-printer_ip:
-printer_prefix:
-printer_network:
-printer_broadcast:
+printer_mac:   # The printer's MAC address
+printer_ip:   # The printer's IP address
+printer_prefix:   # The printer's prefix
+printer_network:   # The printer's network address
+printer_broadcast:   # The printer's broadcast address

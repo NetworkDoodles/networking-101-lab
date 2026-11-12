@@ -2,7 +2,7 @@
   --bg: #040a14; --panel: #07111f; --raised: #0c1b2e; --line: #16304a; --line-strong: #24496b;
   --cyan: #3ad7ff; --ice: #d9f6ff; --text: #c4e3f0; --muted: #6f97ad; --green: #4dffb0; --red: #ff5d6c;
   --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --guide: 440px;
+  --guide: 480px;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -114,6 +114,18 @@ body.dragging iframe { pointer-events: none; }
 .answers textarea { height: 18vh; min-height: 90px; max-height: 40vh; resize: vertical; width: 100%; padding: 8px 10px; border-radius: 8px;
   border: 1px solid var(--line-strong); background: var(--bg); color: var(--text); font: 13px/1.5 var(--mono); tab-size: 2; }
 .answers textarea:focus { outline: none; border-color: var(--cyan); }
+/* answers as a form: a box per question */
+.answers-form { display: none; max-height: 30vh; overflow: auto; padding: 2px 2px 6px; }
+.answers.is-form .answers-form { display: block; }
+.answers.is-form textarea { display: none; }
+.answers.folded .answers-form { display: none; }
+.af-head { margin: 10px 0 4px; font: 12px/1.4 var(--mono); color: var(--muted); }
+.af-head:first-child { margin-top: 2px; }
+.af-head b { color: var(--cyan); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; font-size: 11px; margin-right: 6px; }
+.af-row { display: flex; flex-direction: column; gap: 3px; margin: 0 0 8px; font-size: 12.5px; color: var(--text); }
+.af-row input { height: 30px; padding: 0 9px; border-radius: 7px; border: 1px solid var(--line-strong); background: var(--bg);
+  color: var(--ice); font: 13px var(--mono); }
+.af-row input:focus { outline: none; border-color: var(--cyan); }
 
 /* the Topology tab: the same look as the guide's animations */
 .topo { position: relative; height: 100%; display: flex; flex-direction: column; background:
