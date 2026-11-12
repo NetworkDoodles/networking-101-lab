@@ -28,20 +28,34 @@ if [ -z "$NAME" ] && [ -r "$SHARED" ]; then
   NAME="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("CODESPACE_NAME", ""))' "$SHARED")"
 fi
 
-# A few tries: on the very first start the site may still be setting the tunnel up.
-for try in 1 2 3 4; do
+ask() {
   resp="$(curl -s --max-time 20 -w '\n%{http_code}' -X POST "$LAUNCHER/api/codespace-tunnel" \
     -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
     -d "{\"codespace\": \"$NAME\"}")"
   code="${resp##*$'\n'}"
   body="${resp%$'\n'*}"
-  [ "$code" = 200 ] && break
-  sleep 10
+}
+# 200: here's the tunnel. 404: not opened from the site, nothing to do. 409: opened from the site, but its tunnel
+# isn't made yet (it is when you click Open the lab), so keep asking: for a minute here, then for half an hour
+# in the background, so the dev container's start doesn't wait on it.
+[ "${1:-}" = --wait ] && tries=120 || tries=6
+for i in $(seq 1 "$tries"); do
+  ask
+  [ "$code" = 200 ] || [ "$code" = 404 ] && break
+  sleep 15
 done
-if [ "$code" != 200 ]; then
-  echo "lab app: not opened from the site, so no tunnel (port 8000 as usual)"
-  exit 0
-fi
+case "$code" in
+  200) ;;
+  404) echo "lab app: not opened from the site, so no tunnel (port 8000 as usual)"; exit 0 ;;
+  *)
+    if [ "${1:-}" != --wait ]; then
+      setsid nohup bash "$0" --wait > "$RUN/tunnel-wait.log" 2>&1 < /dev/null &
+      echo "lab app: waiting for the site to make this codespace's tunnel (in the background)"
+    else
+      echo "lab app: gave up waiting for the tunnel (last answer: $code)"
+    fi
+    exit 0 ;;
+esac
 read -r TUNNEL HOST < <(python3 -c 'import json,sys; d=json.load(sys.stdin); print(d["token"], d["host"])' <<<"$body")
 
 pkill -f "cloudflared tunnel" 2>/dev/null || true
