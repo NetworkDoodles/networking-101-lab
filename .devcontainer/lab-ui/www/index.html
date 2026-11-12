@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab · Network Doodles</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="bar">
+  <button class="icon" id="toggle-guide" title="Show or hide the guide (Ctrl+\)" aria-pressed="true">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>
+  </button>
+  <span class="brand"><b>Network Doodles</b> <span id="lab-title"></span></span>
+  <nav class="tabs" id="tabs" role="tablist"></nav>
+  <span class="spacer"></span>
+  <span class="net" id="net" hidden></span>
+  <span class="progress" id="progress" title="Tasks whose check passed"></span>
+  <button class="icon" id="reload" title="Reload this tab">
+    <svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg>
+  </button>
+  <button class="finish" id="finish" hidden title="Delete this lab's codespace: you're done with it">Finish lab</button>
+  <a class="icon" id="popout" title="Open this tab in its own browser tab" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24"><path d="M14 4h6v6"/><path d="M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>
+  </a>
+</header>
+
+<div class="body">
+  <aside class="guide" id="guide">
+    <div class="guide-head">
+      <button class="icon" id="prev" title="Previous task"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <select id="task" aria-label="Task"></select>
+      <button class="icon" id="next" title="Next task"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+    </div>
+    <iframe id="guide-frame" title="Lab guide"></iframe>
+    <div class="check">
+      <div class="check-out" id="check-out" hidden><pre></pre></div>
+      <button class="btn" id="check"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg> <span>Check task</span></button>
+    </div>
+  </aside>
+  <div class="split" id="split" title="Drag to resize"></div>
+  <main class="panes" id="panes"></main>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

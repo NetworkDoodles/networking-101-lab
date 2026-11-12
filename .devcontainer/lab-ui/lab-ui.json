@@ -1,0 +1,14 @@
+{
+  "title": "Networking 101 hands on",
+  "guide": "https://networkdoodles.com/labs/networking-101-lab/",
+  "network": {"name": "net101", "nodes": 8},
+  "launcher": "https://labs.networkdoodles.com",
+  "chapters": [
+    {"n": 1, "title": "Your computer", "tasks": [["1.1", "Meet your computer"], ["1.2", "Get an address"]]},
+    {"n": 2, "title": "Your network", "tasks": [["2.1", "Who's next door?"], ["2.2", "One wrong number"]]},
+    {"n": 3, "title": "Other networks", "tasks": [["3.1", "Across two routers"], ["3.2", "Names for addresses"], ["3.3", "Which door?"]]}
+  ],
+  "tabs": [
+    {"id": "code", "name": "VS Code", "path": "/code/", "port": 13337, "strip": true}
+  ]
+}

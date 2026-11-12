@@ -5,7 +5,8 @@
   //
   //   Codespaces  the badge in the README: nothing to install
   //   VS Code     "Dev Containers: Reopen in Container"
-  //   Browser     devcontainer up, then http://localhost:13337 (code-server)
+  //   The site    "Open lab" on the guide page: straight into the lab app, no editor (labs.networkdoodles.com)
+  //   Browser     devcontainer up, then http://localhost:8000 (the lab app: the guide and VS Code)
   "name": "Network Doodles · Networking 101 hands on",
   "build": { "dockerfile": "Dockerfile", "context": ".." },
   "privileged": true,
@@ -24,15 +25,24 @@
     }
   },
 
-  // code-server has no password, so it is only ever published on this machine's loopback.
-  "appPort": ["127.0.0.1:13337:13337"],
-  "forwardPorts": [13337],
-  "portsAttributes": { "13337": { "label": "code-server (browser IDE)", "onAutoForward": "silent" } },
+  // 8000: the lab app (.devcontainer/lab-ui/): the guide on the left, VS Code (code-server, 13337) in a tab, both
+  // behind this one port. Codespaces keeps it private (only you, signed in to GitHub, can open it): keep it that
+  // way, nothing behind it has a login of its own. Locally it's published on this machine's loopback only.
+  "appPort": ["127.0.0.1:8000:8000"],
+  "forwardPorts": [8000],
+  "portsAttributes": {
+    // Opens the first time Codespaces forwards it. After that: the globe icon on "Lab" in the PORTS tab.
+    "8000": { "label": "Lab", "onAutoForward": "openBrowser", "protocol": "http" },
+    "13337": { "label": "code-server (also in the lab app)", "onAutoForward": "silent" }
+  },
 
+  // First of all, before anything else is set up: the lab app, so it's up in seconds and shows the rest.
+  "onCreateCommand": "bash .devcontainer/lab-ui/start.sh",
   // Once, when the container is created: the images, inside this container's own Docker.
   "postCreateCommand": "make setup images",
-  // Every start: the network.
-  "postStartCommand": "make up",
+  // Every start: the lab app (already running on the first start), its tunnel if the lab was opened from the
+  // site, and the network, side by side.
+  "postStartCommand": { "app": "bash .devcontainer/lab-ui/start.sh && bash .devcontainer/lab-ui/tunnel.sh", "lab": "make up" },
 
   "customizations": {
     "vscode": {
