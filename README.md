@@ -1,6 +1,6 @@
 # Networking 101, part 2: hands on
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/NetworkDoodles/networking-101-lab?quickstart=1)
+**[▶ Open the lab](https://labs.networkdoodles.com/open/networking-101-lab)**: one click, nothing to install
 
 The hands-on half of [Networking 101](https://networkdoodles.com/labs/networking-101/). You log in to real
 computers, a switch and two routers, run the commands network engineers use every day, and match what they
@@ -17,18 +17,14 @@ routing and DNS.
 
 ## Start
 
-The easy way: **Open the lab** on the [guide's page](https://networkdoodles.com/labs/networking-101-lab/), and
-sign in with GitHub. It creates your codespace and opens the lab app: the guide on the left, VS Code on the
-right. The first start takes a few minutes.
+**Open the lab** (the link above, or the button on the [guide's page](https://networkdoodles.com/labs/networking-101-lab/)) and
+sign in with GitHub. It creates your own codespace, on your GitHub account's free allowance, and opens the lab
+app: the guide on the left, VS Code on the right. The first start takes a few minutes; the top bar says
+**network up** when it's ready. Then follow [task 1.1](https://networkdoodles.com/labs/networking-101-lab/task-1-1/):
+**Check task**, under the guide, checks your work.
 
-Or from here, in GitHub's own editor:
-
-1. Click **Open in GitHub Codespaces** above, then **Create codespace**. If VS Code asks whether you trust
-   the folder, click **Trust Folder & Continue**.
-2. The lab app opens in a new browser tab (port 8000, **Lab** in the PORTS tab). Wait for it to say
-   **network up**: the first start takes a few minutes.
-3. Follow [task 1.1](https://networkdoodles.com/labs/networking-101-lab/task-1-1/). **Check task**, under the
-   guide, checks your work.
+On your own laptop instead: open the repo in its dev container (VS Code's *Reopen in Container*, or
+`npx @devcontainers/cli up --workspace-folder .`), then the lab app is at http://localhost:8000.
 
 ## Commands
 
