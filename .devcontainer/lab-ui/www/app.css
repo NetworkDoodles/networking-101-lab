@@ -74,6 +74,57 @@ body.dragging iframe { pointer-events: none; }
 .idle .btn { width: auto; padding: 0 18px; }
 .idle pre { max-width: 680px; text-align: left; font: 12px/1.5 var(--mono); white-space: pre-wrap; }
 
+/* terminal tabs: closable */
+.tab.term { text-transform: none; letter-spacing: 0; }
+.tab .x { margin-left: 2px; padding: 0 4px; border-radius: 4px; color: var(--muted); font-size: 15px; line-height: 1; }
+.tab .x:hover { background: var(--raised); color: var(--red); }
+
+/* answers, under the guide */
+.answers { border-top: 1px solid var(--line); padding: 8px 8px 0; display: flex; flex-direction: column; gap: 6px; }
+.answers-head { display: flex; justify-content: space-between; font: 12px var(--mono); color: var(--muted); }
+.answers-pick { display: flex; gap: 4px; flex-wrap: wrap; }
+.answers-pick button { border: 0; border-radius: 6px; padding: 3px 8px; background: none; color: var(--muted); font: 12px var(--mono); cursor: pointer; }
+.answers-pick button[aria-pressed="true"] { background: var(--raised); color: var(--ice); }
+.answers-pick button:only-child { cursor: default; padding-left: 0; background: none; }
+.answers-state { color: var(--muted); }
+.answers textarea { height: 28vh; min-height: 120px; resize: vertical; width: 100%; padding: 8px 10px; border-radius: 8px;
+  border: 1px solid var(--line-strong); background: var(--bg); color: var(--text); font: 13px/1.5 var(--mono); tab-size: 2; }
+.answers textarea:focus { outline: none; border-color: var(--cyan); }
+
+/* the Topology tab: the same look as the guide's animations */
+.topo { position: relative; height: 100%; display: flex; flex-direction: column; background:
+  radial-gradient(circle at 1px 1px, rgba(58, 215, 255, .07) 1px, transparent 0) 0 0 / 22px 22px, var(--bg); }
+.topo svg { flex: 1; width: 100%; height: auto; min-height: 0; stroke: none; fill: none; }
+.topo-hint { margin: 0; padding: 10px 16px 14px; text-align: center; font: 12px var(--mono); color: var(--muted); }
+.topo .ns-link line { stroke: var(--line-strong); stroke-width: 3; stroke-linecap: round; }
+.topo .ns-link line.hit { stroke: transparent; stroke-width: 16; }
+.topo .ns-link:hover line:not(.hit) { stroke: var(--cyan); }
+.topo .ns-node .hit { fill: transparent; stroke: none; }
+.topo .ns-node .ico { fill: #0a1a2c; stroke: var(--line-strong); stroke-width: 2; transition: stroke .2s, filter .2s; }
+.topo .ns-node .ico.top { fill: #0e2236; }
+.topo .ns-node .scr { fill: #0f2a40; }
+.topo .ns-node .scr-line, .topo .ns-node .arw { fill: none; stroke: var(--muted); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.topo .ns-node .dot { fill: var(--muted); }
+.topo .ns-node .lbl { fill: var(--ice); font: 600 15px Inter, system-ui, sans-serif; text-anchor: middle; }
+.topo .ns-node .sub { fill: var(--muted); font: 12px var(--mono); text-anchor: middle; }
+.topo .ns-node .lbl, .topo .ns-node .sub { paint-order: stroke; stroke: var(--bg); stroke-width: 5px; stroke-linejoin: round; }
+.topo .ns-node.clickable { cursor: pointer; outline: none; }
+.topo .ns-node.clickable:hover .ico, .topo .ns-node.clickable:focus-visible .ico { stroke: var(--cyan); filter: drop-shadow(0 0 7px var(--cyan)); }
+.topo .ns-node.clickable:hover .arw, .topo .ns-node.clickable:hover .scr-line { stroke: var(--cyan); }
+.topo .ns-node.down { opacity: .45; }
+.topo .ns-node.down .ico { stroke-dasharray: 4 4; }
+.topo-tip { position: absolute; z-index: 3; max-width: 340px; padding: 10px 12px; border-radius: 10px; pointer-events: none;
+  border: 1px solid var(--line-strong); background: rgba(7, 17, 31, .97); box-shadow: 0 8px 30px rgba(0, 0, 0, .5); font-size: 13px; }
+.topo-tip p { margin: 6px 0 0; color: var(--text); }
+.topo-tip .tt-head { display: flex; justify-content: space-between; gap: 14px; align-items: baseline; }
+.topo-tip .tt-head b { color: var(--ice); font: 600 14px var(--mono); }
+.topo-tip .tt-head .up { color: var(--green); font: 11px var(--mono); }
+.topo-tip .tt-head .down { color: #ffb547; font: 11px var(--mono); }
+.topo-tip table { margin-top: 8px; border-collapse: collapse; font: 12px/1.5 var(--mono); }
+.topo-tip th { padding: 1px 12px 1px 0; color: var(--muted); font-weight: 400; text-align: left; vertical-align: top; white-space: nowrap; }
+.topo-tip td { color: var(--text); }
+.topo-tip .tt-foot { color: var(--cyan); font: 12px var(--mono); }
+
 @media (max-width: 760px) {
   .brand { display: none; }
   .guide { position: absolute; top: 46px; bottom: 0; left: 0; width: 100%; max-width: none; z-index: 5; }

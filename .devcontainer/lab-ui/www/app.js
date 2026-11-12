@@ -25,6 +25,49 @@
     btn.hidden = id === "overview";
     btn.querySelector("span").textContent = "Check task " + id;
     $("#check-out").hidden = true;
+    loadAnswers(id);
+  }
+
+  // ── files ────────────────────────────────────────────────────────────────
+  // The files a task has you edit (its answers file, and any others: "answers" and "edit" in lab-ui.json) are
+  // edited here, under the guide, so a lab can do without the VS Code tab. A check saves them first.
+  let files = [], fileTask = null, cur = -1;
+  async function loadAnswers(id) {
+    const box = $("#answers");
+    if (!(cfg.answers || cfg.edit) || id === "overview") { await saveAnswers(); box.hidden = true; files = []; cur = -1; return; }
+    await saveAnswers();
+    const r = await api("files?task=" + encodeURIComponent(id)).catch(() => null);
+    files = (r && r.files || []).map((f) => ({ ...f, saved: f.text }));
+    fileTask = id;
+    cur = -1;
+    box.hidden = !files.length;
+    const pick = $("#answers-pick");
+    pick.innerHTML = "";
+    files.forEach((f, i) => {
+      const b = document.createElement("button");
+      b.textContent = f.path;
+      b.onclick = () => showFile(i);
+      pick.append(b);
+    });
+    if (files.length) showFile(0);
+  }
+  function showFile(i) {
+    if (cur >= 0) files[cur].text = $("#answers-text").value;
+    cur = i;
+    [...$("#answers-pick").children].forEach((b, j) => b.setAttribute("aria-pressed", i === j));
+    $("#answers-text").value = files[i].text;
+    $("#answers-state").textContent = files[i].text === files[i].saved ? "" : "not saved yet";
+  }
+  async function saveAnswers() {
+    if (cur < 0) return;
+    files[cur].text = $("#answers-text").value;
+    for (const f of files) {
+      if (f.text === f.saved) continue;
+      const r = await api("file", { task: fileTask, path: f.path, text: f.text }).catch(() => null);
+      if (r && r.saved) f.saved = f.text;
+      else { $("#answers-state").textContent = "not saved: " + ((r && r.error) || "no answer"); return; }
+    }
+    $("#answers-state").textContent = "saved";
   }
   function step(d) {
     const order = ["overview", ...tasks], i = order.indexOf($("#task").value);
@@ -50,6 +93,7 @@
     const id = $("#task").value, btn = $("#check"), out = $("#check-out");
     btn.disabled = true;
     btn.querySelector("span").textContent = "Checking " + id + " …";
+    await saveAnswers();
     try {
       const r = await api("check", { task: id });
       out.className = "check-out " + (r.ok ? "ok" : "bad");
@@ -69,6 +113,7 @@
   function pane(t) { return document.getElementById("pane-" + t.id); }
   function load(t) {
     const p = pane(t);
+    if (t.kind === "topology") return topology(p);
     if (t.start && !status.services[t.id]) return idle(t);
     if (!p.querySelector("iframe")) {
       p.innerHTML = "";
@@ -117,14 +162,158 @@
     const t = cfg.tabs.find((x) => x.id === id) || cfg.tabs[0];
     active = t;
     store.set("tab", t.id);
+    if (!t.node) store.set("lasttab", t.id);
     for (const x of cfg.tabs) {
       document.getElementById("tab-" + x.id).setAttribute("aria-selected", x === t);
       pane(x).classList.toggle("on", x === t);
     }
-    $("#popout").href = t.path;
+    $("#popout").href = t.path || "";
+    $("#popout").hidden = !t.path;
     load(t);
   }
+  function addTab(t, at) {
+    const b = document.createElement("button");
+    b.className = "tab" + (t.node ? " term" : "");
+    b.id = "tab-" + t.id;
+    b.setAttribute("role", "tab");
+    b.innerHTML = "<span class='dot'></span><span></span>";
+    b.children[1].textContent = t.name;
+    b.onclick = () => select(t.id);
+    if (t.node) {
+      const x = document.createElement("span");
+      x.className = "x";
+      x.title = "Close " + t.name + "'s terminal";
+      x.textContent = "×";
+      x.onclick = (e) => { e.stopPropagation(); closeTerminal(t); };
+      b.append(x);
+    }
+    $("#tabs").append(b);
+    const p = document.createElement("div");
+    p.className = "pane";
+    p.id = "pane-" + t.id;
+    $("#panes").append(p);
+  }
+
+  // ── terminals ────────────────────────────────────────────────────────────
+  // Clicking a node on the Topology tab opens a terminal on it, in a tab of its own (or goes back to it).
+  const termIds = () => cfg.tabs.filter((t) => t.node).map((t) => t.node);
+  function openTerminal(node, show = true) {
+    let t = cfg.tabs.find((x) => x.node === node);
+    if (!t) {
+      t = { id: "term-" + node, name: node, node, path: "/term/?arg=" + encodeURIComponent(node) };
+      cfg.tabs.push(t);
+      addTab(t);
+      store.set("terms", termIds().join(" "));
+    }
+    if (show) select(t.id);
+  }
+  function closeTerminal(t) {
+    cfg.tabs = cfg.tabs.filter((x) => x !== t);
+    document.getElementById("tab-" + t.id).remove();
+    pane(t).remove();
+    store.set("terms", termIds().join(" "));
+    if (active === t) select(store.get("lasttab", cfg.tabs[0].id));
+  }
+
+  // ── topology ─────────────────────────────────────────────────────────────
+  // The lab's network, drawn like the guide's animations. Hover a node for what it is and what its ports
+  // connect to; click it for a terminal on it.
+  const NS = "http://www.w3.org/2000/svg";
+  const el = (tag, attrs = {}, parent) => {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.append(e);
+    return e;
+  };
+  // the same icons as the guide's animations (the site's netsim.js), drawn around (0,0); each returns its label's y
+  const ICONS = {
+    pc(g) { el("rect", { class: "ico", x: -24, y: -22, width: 48, height: 32, rx: 4 }, g); el("rect", { class: "scr", x: -19, y: -17, width: 38, height: 22, rx: 2 }, g); el("path", { class: "ico", d: "M-7 10h14l3 8h-20z" }, g); return 32; },
+    laptop(g) { el("rect", { class: "ico", x: -20, y: -20, width: 40, height: 26, rx: 3 }, g); el("rect", { class: "scr", x: -16, y: -16, width: 32, height: 18, rx: 2 }, g); el("path", { class: "ico", d: "M-27 7h54l-5 8h-44z" }, g); return 30; },
+    printer(g) { el("rect", { class: "scr", x: -14, y: -22, width: 28, height: 12 }, g); el("rect", { class: "ico", x: -24, y: -12, width: 48, height: 22, rx: 4 }, g); el("rect", { class: "scr", x: -14, y: 4, width: 28, height: 14 }, g); return 32; },
+    server(g) { for (let i = 0; i < 3; i++) { el("rect", { class: "ico", x: -20, y: -24 + i * 15, width: 40, height: 13, rx: 2 }, g); el("circle", { class: "dot", cx: -13, cy: -17.5 + i * 15, r: 2 }, g); el("path", { class: "scr-line", d: `M-4 ${-17.5 + i * 15}h17` }, g); } return 34; },
+    switch(g) { el("rect", { class: "ico", x: -30, y: -13, width: 60, height: 26, rx: 5 }, g); el("path", { class: "arw", d: "M-16 -4h30m-5 -4 5 4-5 4M16 5h-30m5 -4-5 4 5 4" }, g); return 27; },
+    router(g) { el("ellipse", { class: "ico", cx: 0, cy: 5, rx: 26, ry: 10 }, g); el("path", { class: "ico", d: "M-26 -5v10a26 10 0 0 0 52 0v-10" }, g); el("ellipse", { class: "ico top", cx: 0, cy: -5, rx: 26, ry: 10 }, g); el("path", { class: "arw", d: "M-14 -9l7 3M14 -1l-7 -3M-3 -12l4 -2M3 2l-4 2" }, g); return 28; },
+    db(g) { el("path", { class: "ico", d: "M-22 -14v28a22 7 0 0 0 44 0v-28" }, g); el("path", { class: "scr-line", d: "M-22 0a22 7 0 0 0 44 0" }, g); el("ellipse", { class: "ico top", cx: 0, cy: -14, rx: 22, ry: 7 }, g); return 30; },
+  };
+  let topoRunning = [], topoTimer;
+  function ports(id) {
+    // "eth2 → laptop eth1", from the links
+    const out = [];
+    for (const [a, b] of cfg.topology.links) {
+      const [an, ap] = a.split(":"), [bn, bp] = b.split(":");
+      if (an === id) out.push([ap, bn + " " + bp]);
+      else if (bn === id) out.push([bp, an + " " + ap]);
+    }
+    return out.sort((x, y) => x[0].localeCompare(y[0], undefined, { numeric: true }));
+  }
+  function topology(p) {
+    if (p.querySelector(".topo")) return topoState();
+    const T = cfg.topology;
+    p.innerHTML = "<div class='topo'><svg></svg><div class='topo-tip' hidden></div><p class='topo-hint'></p></div>";
+    p.querySelector(".topo-hint").textContent = T.hint || "Click a device to open a terminal on it. Hover for its details.";
+    const svg = p.querySelector("svg"), tip = p.querySelector(".topo-tip");
+    const xs = T.nodes.map((n) => n.x), ys = T.nodes.map((n) => n.y);
+    svg.setAttribute("viewBox", [Math.min(...xs) - 90, Math.min(...ys) - 70, Math.max(...xs) - Math.min(...xs) + 180,
+      Math.max(...ys) - Math.min(...ys) + 150].join(" "));
+    const at = Object.fromEntries(T.nodes.map((n) => [n.id, n]));
+    const links = el("g", {}, svg), nodes = el("g", {}, svg);
+    for (const [a, b] of T.links) {
+      const na = at[a.split(":")[0]], nb = at[b.split(":")[0]];
+      const g = el("g", { class: "ns-link" }, links);
+      el("line", { x1: na.x, y1: na.y, x2: nb.x, y2: nb.y }, g);
+      el("line", { class: "hit", x1: na.x, y1: na.y, x2: nb.x, y2: nb.y }, g);
+      g.addEventListener("pointerenter", (e) => showTip(e, "<b>" + a.replace(":", " ") + "</b> ↔ <b>" + b.replace(":", " ") + "</b>"));
+      g.addEventListener("pointermove", moveTip);
+      g.addEventListener("pointerleave", () => { tip.hidden = true; });
+    }
+    for (const n of T.nodes) {
+      const g = el("g", { class: "ns-node k-" + n.icon + (n.shell === false ? "" : " clickable"), transform: `translate(${n.x} ${n.y})`, "data-id": n.id,
+        tabindex: n.shell === false ? -1 : 0, role: "button", "aria-label": n.id + ": " + (n.what || "") }, nodes);
+      el("rect", { class: "hit", x: -40, y: -36, width: 80, height: 92, rx: 10 }, g);
+      const ly = (ICONS[n.icon] || ICONS.pc)(g);
+      el("text", { class: "lbl", y: ly + 6 }, g).textContent = n.id;
+      if (n.sub) el("text", { class: "sub", y: ly + 23 }, g).textContent = n.sub;
+      g.addEventListener("pointerenter", (e) => showTip(e, nodeTip(n)));
+      g.addEventListener("pointermove", moveTip);
+      g.addEventListener("pointerleave", () => { tip.hidden = true; });
+      if (n.shell !== false) {
+        g.addEventListener("click", () => { tip.hidden = true; openTerminal(n.id); });
+        g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openTerminal(n.id); } });
+      }
+    }
+    function showTip(e, html) { tip.innerHTML = html; tip.hidden = false; moveTip(e); }
+    function moveTip(e) {
+      const r = p.getBoundingClientRect(), w = tip.offsetWidth, h = tip.offsetHeight;
+      let x = e.clientX - r.left + 16, y = e.clientY - r.top + 16;
+      if (x + w > r.width - 8) x = e.clientX - r.left - w - 16;
+      if (y + h > r.height - 8) y = e.clientY - r.top - h - 16;
+      tip.style.left = Math.max(8, x) + "px";
+      tip.style.top = Math.max(8, y) + "px";
+    }
+    topoState();
+  }
+  const escHtml = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  function nodeTip(n) {
+    const up = topoRunning.includes(n.id);
+    let h = "<div class='tt-head'><b>" + escHtml(n.id) + "</b><span class='" + (up ? "up" : "down") + "'>" +
+      (up ? "running" : "not running") + "</span></div>";
+    if (n.what) h += "<p>" + escHtml(n.what) + "</p>";
+    const rows = [...(n.details || [])];
+    const ps = ports(n.id);
+    if (ps.length) rows.push(["ports", ps.map(([a, b]) => escHtml(a) + " → " + escHtml(b)).join("<br>"), true]);
+    if (rows.length) h += "<table>" + rows.map(([k, v, raw]) => "<tr><th>" + escHtml(k) + "</th><td>" + (raw ? v : escHtml(v)) + "</td></tr>").join("") + "</table>";
+    if (n.shell !== false) h += "<p class='tt-foot'>Click for a terminal on " + escHtml(n.id) + ".</p>";
+    return h;
+  }
+  async function topoState() {
+    const r = await api("topology").catch(() => null);
+    if (r) topoRunning = r.running;
+    for (const g of document.querySelectorAll(".topo .ns-node")) g.classList.toggle("down", !topoRunning.includes(g.dataset.id));
+    clearTimeout(topoTimer);
+    if (active && active.kind === "topology") topoTimer = setTimeout(topoState, topoRunning.length < cfg.topology.nodes.length ? 3000 : 15000);
+  }
   function reload() {
+    if (active.kind === "topology") return topoState();
     const f = pane(active).querySelector("iframe");
     if (f) f.src = active.path; else load(active);
   }
@@ -136,9 +325,13 @@
     const done = tasks.filter((id) => status.progress[id] === true).length;
     $("#progress").innerHTML = "<b>" + done + "</b>/" + tasks.length + " tasks checked";
     for (const t of cfg.tabs) {
+      if (t.node) { document.querySelector("#tab-" + t.id + " .dot").classList.toggle("up", (status.running || []).includes(t.node)); continue; }
       document.querySelector("#tab-" + t.id + " .dot").classList.toggle("up", !!status.services[t.id]);
-      // a service that stopped (make wireshark-stop) goes back to its start button
+      // a service that stopped (make wireshark-stop) goes back to its start button, and one that came up
+      // (started from a terminal, or still starting when the tab opened) replaces it
       if (t.start && !status.services[t.id] && pane(t).querySelector("iframe")) idle(t);
+      else if (t.start && status.services[t.id] && t === active && !pane(t).querySelector("iframe")
+        && !pane(t).querySelector("button:disabled")) { pane(t).innerHTML = ""; load(t); }
     }
     // rebuild the picker only when a result changed: rebuilding closes it if it's open
     const p = JSON.stringify(status.progress);
@@ -151,17 +344,18 @@
   function netStatus(n) {
     const el = $("#net");
     if (!n) return;
+    const what = n.what || "network", units = n.what ? " containers" : " nodes";
     el.hidden = false;
     let text, cls, title;
     if (!n.docker) {
       [text, cls] = ["setting up the lab …", "wait"];
       title = "Docker is starting and the lab's images are on their way. The VS Code tab's terminal shows the details.";
     } else if (n.running >= n.total) {
-      [text, cls, title] = ["network up", "up", n.running + " nodes running"];
+      [text, cls, title] = [what + " up", "up", n.running + units + " running"];
     } else {
-      [text, cls] = ["network " + n.running + "/" + n.total, "wait"];
-      title = n.running ? "Nodes are starting: the network is up when all " + n.total + " are running."
-        : "The network isn't running yet. It starts by itself after the first setup; make up starts it by hand.";
+      [text, cls] = [what + " " + n.running + "/" + n.total, "wait"];
+      title = n.running ? "Starting: " + what + " is up when all " + n.total + units + " are running."
+        : what + " isn't running yet. It starts by itself after the first setup; make up starts it by hand.";
     }
     el.textContent = text;
     el.className = "net " + cls;
@@ -248,22 +442,14 @@
   async function main() {
     cfg = await api("config");
     tasks = cfg.chapters.flatMap((c) => c.tasks.map((t) => t[0]));
+    // "hidden": true keeps a tab's address working but leaves it out of the bar (a lab that needs no editor)
+    cfg.tabs = cfg.tabs.filter((t) => !t.hidden);
     document.title = cfg.title + " · Network Doodles lab";
     $("#lab-title").textContent = "· " + cfg.title;
-    for (const t of cfg.tabs) {
-      const b = document.createElement("button");
-      b.className = "tab";
-      b.id = "tab-" + t.id;
-      b.setAttribute("role", "tab");
-      b.innerHTML = "<span class='dot'></span><span></span>";
-      b.lastChild.textContent = t.name;
-      b.onclick = () => select(t.id);
-      $("#tabs").append(b);
-      const p = document.createElement("div");
-      p.className = "pane";
-      p.id = "pane-" + t.id;
-      $("#panes").append(p);
-    }
+    for (const t of cfg.tabs) addTab(t);
+    // the terminals you had open, and any the lab opens to start with ("terminals": ["laptop"])
+    const nodes = new Set((cfg.topology?.nodes || []).filter((n) => n.shell !== false).map((n) => n.id));
+    for (const n of (store.get("terms", null) ?? (cfg.terminals || []).join(" ")).split(" ")) if (nodes.has(n)) openTerminal(n, false);
     const w = store.get("width");
     if (w) document.documentElement.style.setProperty("--guide", w);
     toggleGuide(store.get("guide") === "hidden");
@@ -283,6 +469,9 @@
     $("#prev").onclick = () => step(-1);
     $("#next").onclick = () => step(1);
     $("#check").onclick = check;
+    $("#answers-text").addEventListener("input", () => { $("#answers-state").textContent = "not saved yet"; });
+    $("#answers-text").addEventListener("blur", saveAnswers);
+    $("#answers-text").addEventListener("keydown", (e) => { if ((e.ctrlKey || e.metaKey) && e.key === "s") { e.preventDefault(); saveAnswers(); } });
     $("#reload").onclick = reload;
     $("#toggle-guide").onclick = () => toggleGuide();
     document.addEventListener("keydown", (e) => { if (e.ctrlKey && e.key === "\\") toggleGuide(); });

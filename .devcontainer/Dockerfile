@@ -38,4 +38,14 @@ RUN case "$TARGETARCH" in \
  && curl -fsSL -o /usr/local/bin/cloudflared "https://github.com/cloudflare/cloudflared/releases/download/${CLOUDFLARED}/cloudflared-linux-${TARGETARCH}" \
  && echo "$sum  /usr/local/bin/cloudflared" | sha256sum -c - \
  && chmod 755 /usr/local/bin/cloudflared && cloudflared --version
+# ttyd: the lab app's web terminals. Click a device on the Topology tab and its shell opens in a tab.
+ARG TTYD=1.7.7
+RUN case "$TARGETARCH" in \
+      amd64) arch=x86_64 sum=8a217c968aba172e0dbf3f34447218dc015bc4d5e59bf51db2f2cd12b7be4f55 ;; \
+      arm64) arch=aarch64 sum=b38acadd89d1d396a0f5649aa52c539edbad07f4bc7348b27b4f4b7219dd4165 ;; \
+      *) echo "no ttyd for $TARGETARCH" >&2; exit 1 ;; \
+    esac \
+ && curl -fsSL -o /usr/local/bin/ttyd "https://github.com/tsl0922/ttyd/releases/download/${TTYD}/ttyd.${arch}" \
+ && echo "$sum  /usr/local/bin/ttyd" | sha256sum -c - \
+ && chmod 755 /usr/local/bin/ttyd && ttyd --version
 USER vscode

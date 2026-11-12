@@ -65,7 +65,8 @@ TUNNEL_TOKEN="$TUNNEL" setsid nohup cloudflared tunnel --no-autoupdate --logleve
 # make sure it's really up: say so if it isn't, instead of claiming an address that doesn't answer
 for i in $(seq 1 20); do
   sleep 1
-  grep -q "Registered tunnel connection" "$RUN/cloudflared.log" 2>/dev/null && { echo "lab app: https://$HOST/"; exit 0; }
+  # $RUN/host: the lab's address, for anything that prints a link you'd open in your browser
+  grep -q "Registered tunnel connection" "$RUN/cloudflared.log" 2>/dev/null && { echo "$HOST" > "$RUN/host"; echo "lab app: https://$HOST/"; exit 0; }
   pgrep -x cloudflared >/dev/null || break
 done
 echo "lab app: the tunnel didn't connect. Its log, $RUN/cloudflared.log, ends:"
