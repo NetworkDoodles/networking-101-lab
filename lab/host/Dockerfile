@@ -1,5 +1,5 @@
 # The lab's hosts: a small Linux computer with the everyday network tools.
-#   ip (iproute2)   addresses, routes and the neighbour (ARP) table
+#   ip (iproute2)   addresses, routes and the neighbor (ARP) table
 #   ping, traceroute, arp (net-tools), dig and nslookup (bind-tools), curl
 #   udhcpc          the DHCP client (part of busybox)
 #   dnsmasq, httpd  only the dns and web hosts run these

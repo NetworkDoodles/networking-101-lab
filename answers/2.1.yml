@@ -6,7 +6,7 @@
 laptop_port:   # The laptop's port on sw1
 printer_port:   # The printer's port on sw1
 
-# Challenge: ping web from the laptop, then read the laptop's neighbour table (ip neigh)
+# Challenge: ping web from the laptop, then read the laptop's neighbor table (ip neigh)
 web_neighbor_ip:   # The address the laptop asked ARP about, to reach web
 web_neighbor_mac:   # The MAC address it learned for it
 r1_port:   # r1's port on sw1
