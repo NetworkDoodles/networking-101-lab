@@ -10,6 +10,9 @@
   "name": "Network Doodles · Networking 101 hands on",
   "build": { "dockerfile": "Dockerfile", "context": ".." },
   "privileged": true,
+  // The inner Docker keeps its images on a volume: on the container's own overlay filesystem it can't use
+  // overlay2 and falls back to vfs, a full copy of every image layer (tens of GB).
+  "mounts": ["source=dind-var-lib-docker-${devcontainerId},target=/var/lib/docker,type=volume"],
   "remoteUser": "vscode",
   "hostRequirements": { "cpus": 2, "memory": "4gb" },
 
