@@ -7,7 +7,7 @@
 VENV ?= .venv
 PY := $(VENV)/bin/python
 TOPO := lab/topology.clab.yml
-BOLT := ghcr.io/dkhenderson2/capeos-bolt:0.11.0
+BOLT := ghcr.io/dkhenderson2/capeos-bolt:0.11.2
 HOST := nd-host:1
 NODES := laptop printer broken-pc web dns sw1 r1 r2
 T ?=

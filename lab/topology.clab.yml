@@ -22,17 +22,17 @@ topology:
     # `make reset`; the files themselves never change.
     sw1:
       kind: linux
-      image: ghcr.io/dkhenderson2/capeos-bolt:0.11.0
+      image: ghcr.io/dkhenderson2/capeos-bolt:0.11.2
       env: { CAPEOS_PLATFORM: switch, CAPEOS_USER: admin, CAPEOS_PASSWORD: capeos-lab }
       binds: [configs/sw1.cfg:/flash/startup-config:ro]
     r1:
       kind: linux
-      image: ghcr.io/dkhenderson2/capeos-bolt:0.11.0
+      image: ghcr.io/dkhenderson2/capeos-bolt:0.11.2
       env: { CAPEOS_USER: admin, CAPEOS_PASSWORD: capeos-lab }
       binds: [configs/r1.cfg:/flash/startup-config:ro]
     r2:
       kind: linux
-      image: ghcr.io/dkhenderson2/capeos-bolt:0.11.0
+      image: ghcr.io/dkhenderson2/capeos-bolt:0.11.2
       env: { CAPEOS_USER: admin, CAPEOS_PASSWORD: capeos-lab }
       binds: [configs/r2.cfg:/flash/startup-config:ro]
 
